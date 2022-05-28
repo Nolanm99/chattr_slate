@@ -20,12 +20,12 @@ code_clipboard: true
 
 meta:
   - name: description
-    content: Documentation for the Kittn API
+    content: Documentation for the Chattr API
 ---
 
 # Introduction
 
-Welcome to the Kittn API! You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
+Welcome to the Chattr. You can use our API to access Kittn API endpoints, which can get information on various cats, kittens, and breeds in our database.
 
 We have language bindings in Shell, Ruby, Python, and JavaScript! You can view code examples in the dark area to the right, and you can switch the programming language of the examples with the tabs in the top right.
 
@@ -71,9 +71,11 @@ Kittn expects for the API key to be included in all API requests to the server i
 You must replace <code>meowmeowmeow</code> with your personal API key.
 </aside>
 
-# Kittens
+# Trends
 
-## Get All Kittens
+# Sentiment
+
+## Get Current Stock Sentiment
 
 ```ruby
 require 'kittn'
@@ -95,105 +97,60 @@ curl "http://example.com/api/kittens" \
 ```
 
 ```javascript
-const kittn = require('kittn');
+const axios = require("axios");
 
-let api = kittn.authorize('meowmeowmeow');
-let kittens = api.kittens.get();
-```
-
-> The above command returns JSON structured like this:
-
-```json
-[
-  {
-    "id": 1,
-    "name": "Fluffums",
-    "breed": "calico",
-    "fluffiness": 6,
-    "cuteness": 7
+const options = {
+  method: 'GET',
+  url: 'http://api.chattr.dev/v1/getCurrentStockSentiment',
+  params: {
+    ticker: 'AAPL'
   },
-  {
-    "id": 2,
-    "name": "Max",
-    "breed": "unknown",
-    "fluffiness": 5,
-    "cuteness": 10
+  headers: {
+    'X-RapidAPI-Host': 'alpha-vantage.p.rapidapi.com',
+    'X-RapidAPI-Key': 'a343082d11msh0dfdaf5c982bb8ap17135fjsnf1c70dc0e0c4'
   }
-]
-```
+};
 
-This endpoint retrieves all kittens.
-
-### HTTP Request
-
-`GET http://example.com/api/kittens`
-
-### Query Parameters
-
-Parameter | Default | Description
---------- | ------- | -----------
-include_cats | false | If set to true, the result will also include cats.
-available | true | If set to false, the result will include kittens that have already been adopted.
-
-<aside class="success">
-Remember — a happy kitten is an authenticated kitten!
-</aside>
-
-## Get a Specific Kitten
-
-```ruby
-require 'kittn'
-
-api = Kittn::APIClient.authorize!('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```python
-import kittn
-
-api = kittn.authorize('meowmeowmeow')
-api.kittens.get(2)
-```
-
-```shell
-curl "http://example.com/api/kittens/2" \
-  -H "Authorization: meowmeowmeow"
-```
-
-```javascript
-const kittn = require('kittn');
-
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.get(2);
+axios.request(options).then(function (response) {
+	console.log(response.data);
+}).catch(function (error) {
+	console.error(error);
+});
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "name": "Max",
-  "breed": "unknown",
-  "fluffiness": 5,
-  "cuteness": 10
+	"latestSentiment": {
+		"_id": "62914f5e001f7dbda12365a8",
+		"ticker": "aapl",
+		"sentiment": 1.7692307692307692,
+		"numComments": 13,
+		"timestamp": 1653690206
+	}
 }
 ```
 
-This endpoint retrieves a specific kitten.
-
-<aside class="warning">Inside HTML code blocks like this one, you can't use Markdown, so use <code>&lt;code&gt;</code> blocks to denote code.</aside>
+This endpoint returns the latest sentiment for a specified stock.
 
 ### HTTP Request
 
-`GET http://example.com/kittens/<ID>`
+`GET http://api.chattr.dev/v1/getCurrentStockSentiment`
 
-### URL Parameters
+### Query Parameters
 
-Parameter | Description
---------- | -----------
-ID | The ID of the kitten to retrieve
+Parameter | Default | Description
+--------- | ------- | -----------
+ticker | N/A | The ticker associated with the company/currency you would like to query. Example: 'AAPL'
 
-## Delete a Specific Kitten
+<aside class="notice">
+<code>ticker</code> is a required parameter!
+</aside>
+
+# Companies
+
+## Get Supported Companies
 
 ```ruby
 require 'kittn'
@@ -216,30 +173,49 @@ curl "http://example.com/api/kittens/2" \
 ```
 
 ```javascript
-const kittn = require('kittn');
+const axios = require("axios");
 
-let api = kittn.authorize('meowmeowmeow');
-let max = api.kittens.delete(2);
+const options = {
+  method: 'GET',
+  url: 'http://api.chattr.dev/v1/companies/getSupportedCompanies',
+  headers: {
+    'X-RapidAPI-Host': 'alpha-vantage.p.rapidapi.com',
+    'X-RapidAPI-Key': 'a343082d11msh0dfdaf5c982bb8ap17135fjsnf1c70dc0e0c4'
+  }
+};
+
+axios.request(options).then(function (response) {
+	console.log(response.data);
+}).catch(function (error) {
+	console.error(error);
+});
 ```
 
 > The above command returns JSON structured like this:
 
 ```json
 {
-  "id": 2,
-  "deleted" : ":("
+	"supportedCompanies": [
+		"hood",
+		"goog",
+		"meta",
+		"twtr",
+		"shop",
+    "..."
+	]
 }
 ```
 
-This endpoint deletes a specific kitten.
+Retrieve a list of 
 
 ### HTTP Request
 
-`DELETE http://example.com/kittens/<ID>`
+`GET http://api.chattr.dev/v1/companies/getSupportedCompanies`
 
 ### URL Parameters
 
 Parameter | Description
 --------- | -----------
-ID | The ID of the kitten to delete
+N/A | N/A
 
+# Currencies
